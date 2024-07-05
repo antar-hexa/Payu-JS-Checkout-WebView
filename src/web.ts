@@ -3,8 +3,11 @@ import { WebPlugin } from '@capacitor/core';
 import type { PayUCheckoutWebViewPlugin } from './definitions';
 
 export class PayUCheckoutWebViewWeb extends WebPlugin implements PayUCheckoutWebViewPlugin {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  openWebView(_options: { url: string; postData: string; }): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  closeWebView(): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 }

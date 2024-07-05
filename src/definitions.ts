@@ -1,3 +1,4 @@
 export interface PayUCheckoutWebViewPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  openWebView(options: { url: string, postData:string, callbackUrl:string }): Promise<void>;
+  closeWebView(): Promise<void>;
 }

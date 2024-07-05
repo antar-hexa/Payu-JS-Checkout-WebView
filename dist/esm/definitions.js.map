@@ -1,0 +1,1 @@
+{"version":3,"file":"definitions.js","sourceRoot":"","sources":["../../src/definitions.ts"],"names":[],"mappings":"","sourcesContent":["export interface PayUCheckoutWebViewPlugin {\n  openWebView(options: { url: string, postData:string, callbackUrl:string }): Promise<void>;\n  closeWebView(): Promise<void>;\n}\n"]}

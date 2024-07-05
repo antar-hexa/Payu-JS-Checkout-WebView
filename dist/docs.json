@@ -1,0 +1,41 @@
+{
+  "api": {
+    "name": "PayUCheckoutWebViewPlugin",
+    "slug": "payucheckoutwebviewplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "openWebView",
+        "signature": "(options: { url: string; postData: string; callbackUrl: string; }) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "{ url: string; postData: string; callbackUrl: string; }"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "openwebview"
+      },
+      {
+        "name": "closeWebView",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "closewebview"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [],
+  "enums": [],
+  "typeAliases": [],
+  "pluginConfigs": []
+}

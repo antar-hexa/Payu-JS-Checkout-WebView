@@ -5,19 +5,18 @@
     android:layout_height="match_parent"
     tools:context="com.getcapacitor.BridgeActivity"
     >
-
-    <WebView
-        android:id="@+id/PayuWebview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-
     <ProgressBar
         android:id="@+id/PayuProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-
         />
+    <WebView
+        android:id="@+id/PayuWebview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+
 <!--        android:visibility="gone"-->
 <!--        tools:visibility="gone" -->
 

@@ -107,8 +107,26 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
             progressBar.setVisibility(View.GONE);
         }
     }
+
     @PluginMethod
     public void openWebView(PluginCall call) {
+        String url = call.getString("url");
+        String postData = call.getString("postData");
+        callbackUrl = call.getString("callbackUrl");
+        if (url == null) {
+            call.reject("Must provide a URL");
+            return;
+        }
+
+        Intent intent = new Intent(getContext(), PayuWebviewActivity.class);
+        intent.putExtra("url", url);
+        intent.putExtra("postData", postData);
+        intent.putExtra("callbackUrl", callbackUrl);
+        getActivity().startActivity(intent);
+        call.resolve();
+    }
+    @PluginMethod
+    public void openWebView1(PluginCall call) {
 
         String url = call.getString("url");
         String postData = call.getString("postData");

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.util.Log;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -35,24 +36,41 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
             public void handleOnBackPressed() {
                 Log.d(TAG, "Back pressed inside plugin");
 
-                if (webView != null && webView.canGoBack()) {
-                    webView.goBack();
-                } else if (webView != null) {
-
-                    // Show a confirmation dialog
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle("Confirm Exit")
-                            .setMessage("Are you sure you want to exit?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Close the WebView and set it to null
-                                    closeWebView();
+                if (webView != null) {
+                    webView.evaluateJavascript(
+                            "(function (){\n" +
+                                    "        const back = document.querySelector('#merchant-logo-row > i');\n" +
+                                    "    if (back){\n" +
+                                    "        back.click()\n" +
+                                    "        return true;    \n" +
+                                    "    }  \n" +
+                                    "    else return false;\n" +
+                                    "})()", value -> {
+                                Log.d(TAG, "callback value: " + value + " true");
+                                if (value.equals("true")) {
+                                    //do dothing
+                                } else {
+                                    if (webView.canGoBack()) {
+                                        webView.goBack();
+                                    } else {
+//                                         Show a confirmation dialog
+                                        new AlertDialog.Builder(getActivity())
+                                                .setTitle("Confirm Exit")
+                                                .setMessage("Are you sure you want to exit?")
+                                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Close the WebView and set it to null
+                                                        closeWebView();
+                                                    }
+                                                })
+                                                .setNegativeButton(android.R.string.no, null)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
                                 }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
+                            });
                 }
+
             }
         };
 

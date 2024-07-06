@@ -7,11 +7,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import androidx.activity.OnBackPressedCallback;
 
@@ -28,7 +30,7 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
     private String callbackUrl;
     private static final String TAG = "CapacitorWebViewPlugin";
     private OnBackPressedCallback onBackPressedCallback;
-
+    private ProgressBar progressBar;
 
     private void initializeBackListener() {
         onBackPressedCallback = new OnBackPressedCallback(true) {
@@ -94,6 +96,17 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
         });
     }
 
+    public void showProgressBar() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void hideProgressBar() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
     @PluginMethod
     public void openWebView(PluginCall call) {
 
@@ -113,7 +126,10 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
                 closeWebView(null);
             }
 
-            webView = new WebView(getContext());
+             webView = new WebView(getContext());
+//            webView = findViewById(R.id.PayuWebview);
+//            progressBar = webView.findViewById(R.id.PayuProgressBar);
+            showProgressBar();
             webView.setWebViewClient(new MyWebViewClient());
 
             webView.getSettings().setJavaScriptEnabled(true);
@@ -168,6 +184,7 @@ public class PayUCheckoutWebViewPlugin extends Plugin {
         @Override
         public void onPageFinished(WebView view, String url) {
             Log.d(TAG, "onPageFinished: " + url);
+            hideProgressBar();
         }
 
         @Override

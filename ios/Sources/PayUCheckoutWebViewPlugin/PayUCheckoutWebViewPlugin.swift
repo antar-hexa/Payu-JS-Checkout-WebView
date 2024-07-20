@@ -21,7 +21,7 @@ public class PayUCheckoutWebViewPlugin: CAPPlugin, CAPBridgedPlugin {
         ])
     }
 
-    @objc func echo(_ call: CAPPluginCall) {
+    @objc func openWebView(_ call: CAPPluginCall) {
         guard let urlString = call.getString("url"), let postData = call.getString("postData"), let callbackUrl = call.getString("callbackUrl") else {
             call.reject("Must provide a URL and postData")
             return

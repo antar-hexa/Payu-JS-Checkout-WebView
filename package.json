@@ -1,6 +1,6 @@
 {
   "name": "payu-checkout-webview",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "payu checkout webview",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

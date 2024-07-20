@@ -20,4 +20,22 @@ public class PayUCheckoutWebViewPlugin: CAPPlugin, CAPBridgedPlugin {
             "value": implementation.echo(value)
         ])
     }
+
+    @objc func echo(_ call: CAPPluginCall) {
+        guard let urlString = call.getString("url"), let postData = call.getString("postData"), let callbackUrl = call.getString("callbackUrl") else {
+            call.reject("Must provide a URL and postData")
+            return
+        }
+
+        DispatchQueue.main.async {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let viewController = storyboard.instantiateViewController(withIdentifier: "PayuWebViewController") as? PayuWebViewController {
+                viewController.urlString = urlString
+                viewController.postData = postData
+                viewController.callbackUrl = callbackUrl
+                self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
+            }
+        }
+        call.resolve()
+    }
 }

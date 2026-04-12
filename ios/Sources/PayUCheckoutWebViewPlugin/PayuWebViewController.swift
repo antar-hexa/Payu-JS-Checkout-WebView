@@ -12,16 +12,42 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        webView = WKWebView(frame: self.view.bounds)
-        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        // Navigation bar with back button
+        let navBar = UINavigationBar(frame: .zero)
+        navBar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(navBar)
+        NSLayoutConstraint.activate([
+            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+
+        let navItem = UINavigationItem()
+        navItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(backButtonTapped))
+        navBar.setItems([navItem], animated: false)
+
+        webView = WKWebView(frame: .zero)
+        webView.translatesAutoresizingMaskIntoConstraints = false
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.configuration.preferences.javaScriptEnabled = true
         webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
-        self.view.addSubview(webView)
+        view.addSubview(webView)
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
 
         progressBar = UIProgressView(progressViewStyle: .default)
-        self.view.addSubview(progressBar)
+        progressBar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(progressBar)
+        NSLayoutConstraint.activate([
+            progressBar.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            progressBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            progressBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
 
         if let urlString = urlString, let url = URL(string: urlString), let postData = postData {
             var request = URLRequest(url: url)
@@ -31,11 +57,6 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         }
 
         webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        progressBar.frame = CGRect(x: 0, y: view.safeAreaInsets.top, width: view.frame.width, height: 2)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -49,7 +70,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         }
     }
 
-    @IBAction func backButtonTapped(_ sender: UIBarButtonItem) {
+    @objc func backButtonTapped(_ sender: UIBarButtonItem) {
         if webView.canGoBack {
             webView.goBack()
         } else {

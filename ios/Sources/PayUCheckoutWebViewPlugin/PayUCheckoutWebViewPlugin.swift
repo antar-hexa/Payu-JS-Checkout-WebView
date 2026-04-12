@@ -28,14 +28,12 @@ public class PayUCheckoutWebViewPlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
         DispatchQueue.main.async {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let viewController = storyboard.instantiateViewController(withIdentifier: "PayuWebViewController") as? PayuWebViewController {
-                viewController.urlString = urlString
-                viewController.postData = postData
-                viewController.callbackUrl = callbackUrl
-                viewController.modalPresentationStyle = .fullScreen
-                self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
-            }
+            let viewController = PayuWebViewController()
+            viewController.urlString = urlString
+            viewController.postData = postData
+            viewController.callbackUrl = callbackUrl
+            viewController.modalPresentationStyle = .fullScreen
+            self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
         }
         call.resolve()
     }

@@ -12,7 +12,8 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        webView = WKWebView(frame: self.view.frame)
+        webView = WKWebView(frame: self.view.bounds)
+        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.configuration.preferences.javaScriptEnabled = true
@@ -20,7 +21,6 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         self.view.addSubview(webView)
 
         progressBar = UIProgressView(progressViewStyle: .default)
-        progressBar.frame = CGRect(x: 0, y: self.view.safeAreaInsets.top, width: self.view.frame.width, height: 2)
         self.view.addSubview(progressBar)
 
         if let urlString = urlString, let url = URL(string: urlString), let postData = postData {
@@ -31,6 +31,11 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         }
 
         webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        progressBar.frame = CGRect(x: 0, y: view.safeAreaInsets.top, width: view.frame.width, height: 2)
     }
 
     override func viewWillDisappear(_ animated: Bool) {

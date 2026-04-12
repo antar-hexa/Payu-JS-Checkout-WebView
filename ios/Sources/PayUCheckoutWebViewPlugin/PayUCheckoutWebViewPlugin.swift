@@ -33,6 +33,7 @@ public class PayUCheckoutWebViewPlugin: CAPPlugin, CAPBridgedPlugin {
                 viewController.urlString = urlString
                 viewController.postData = postData
                 viewController.callbackUrl = callbackUrl
+                viewController.modalPresentationStyle = .fullScreen
                 self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
             }
         }

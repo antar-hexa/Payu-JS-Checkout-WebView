@@ -27,14 +27,18 @@ public class PayUCheckoutWebViewPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
+        call.keepAlive = true
+
         DispatchQueue.main.async {
             let viewController = PayuWebViewController()
             viewController.urlString = urlString
             viewController.postData = postData
             viewController.callbackUrl = callbackUrl
             viewController.modalPresentationStyle = .fullScreen
+            viewController.onCallbackUrlReached = { resolvedUrl in
+                call.resolve(["url": resolvedUrl])
+            }
             self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
         }
-        call.resolve()
     }
 }

@@ -8,23 +8,10 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     var callbackUrl: String?
     var urlString: String?
     var postData: String?
+    var onCallbackUrlReached: ((String) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Navigation bar with back button
-        let navBar = UINavigationBar(frame: .zero)
-        navBar.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(navBar)
-        NSLayoutConstraint.activate([
-            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-
-        let navItem = UINavigationItem()
-        navItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(backButtonTapped))
-        navBar.setItems([navItem], animated: false)
 
         webView = WKWebView(frame: .zero)
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +21,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
         view.addSubview(webView)
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -44,7 +31,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         progressBar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(progressBar)
         NSLayoutConstraint.activate([
-            progressBar.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             progressBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
@@ -70,23 +57,6 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         }
     }
 
-    @objc func backButtonTapped(_ sender: UIBarButtonItem) {
-        if webView.canGoBack {
-            webView.goBack()
-        } else {
-            showExitConfirmation()
-        }
-    }
-
-    func showExitConfirmation() {
-        let alertController = UIAlertController(title: "Confirm Exit", message: "Are you sure you want to exit?", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "Yes", style: .default, handler: { _ in
-            self.dismiss(animated: true, completion: nil)
-        }))
-        alertController.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
-        present(alertController, animated: true, completion: nil)
-    }
-
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         progressBar.isHidden = true
     }
@@ -101,37 +71,27 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        print("url.........\(navigationAction.request.url)") 
+        if let url = navigationAction.request.url {
+            let urlAbsolute = url.absoluteString
 
-        if let url = navigationAction.request.url, 
+            // Check if this is the callback URL
+            if let callbackUrl = callbackUrl, urlAbsolute.hasPrefix(callbackUrl) {
+                decisionHandler(.cancel)
+                dismiss(animated: true) {
+                    self.onCallbackUrlReached?(urlAbsolute)
+                }
+                return
+            }
 
-              !url.absoluteString.hasPrefix("http://"), 
+            // Open non-http(s) URLs (tel:, sms:, mailto:, etc.) in the system
+            if !urlAbsolute.hasPrefix("http://"), !urlAbsolute.hasPrefix("https://"),
+               UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                decisionHandler(.cancel)
+                return
+            }
+        }
 
-              !url.absoluteString.hasPrefix("https://"), 
-
-              UIApplication.shared.canOpenURL(url) { 
-
-  
-
-              // have UIApplication handle the url (sms:, tel:, mailto:, ...) 
-
-              UIApplication.shared.open(url, options: [:], completionHandler: nil) 
-
-  
-
-              // cancel the request (handled by UIApplication) 
-
-              decisionHandler(.cancel) 
-
-          } 
-
-          else { 
-
-              // allow the request 
-
-              decisionHandler(.allow) 
-
-        } 
+        decisionHandler(.allow)
     }
-
 }

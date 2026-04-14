@@ -9,6 +9,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     var urlString: String?
     var postData: String?
     var onCallbackUrlReached: ((String) -> Void)?
+    private weak var backButton: UIButton?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +45,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
         backButton.layer.cornerRadius = 18
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        backButton.isHidden = true  // hidden until page load confirms no .back element
         view.addSubview(backButton)
         NSLayoutConstraint.activate([
             backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
@@ -51,6 +53,7 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
             backButton.widthAnchor.constraint(equalToConstant: 36),
             backButton.heightAnchor.constraint(equalToConstant: 36)
         ])
+        self.backButton = backButton
 
         if let urlString = urlString, let url = URL(string: urlString), let postData = postData {
             var request = URLRequest(url: url)
@@ -86,6 +89,19 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         progressBar.isHidden = true
+        updateBackButtonVisibility()
+    }
+
+    private func updateBackButtonVisibility() {
+        // Small delay to allow JS-rendered content to appear in the DOM
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.webView.evaluateJavaScript("document.querySelector('.back') !== null") { [weak self] result, _ in
+                let pageHasBackButton = (result as? Bool) == true
+                DispatchQueue.main.async {
+                    self?.backButton?.isHidden = pageHasBackButton
+                }
+            }
+        }
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {

@@ -36,6 +36,22 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
             progressBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
 
+        let backButton = UIButton(type: .system)
+        let chevron = UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: 17, weight: .semibold))
+        backButton.setImage(chevron, for: .normal)
+        backButton.tintColor = .label
+        backButton.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.85)
+        backButton.layer.cornerRadius = 18
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        view.addSubview(backButton)
+        NSLayoutConstraint.activate([
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            backButton.widthAnchor.constraint(equalToConstant: 36),
+            backButton.heightAnchor.constraint(equalToConstant: 36)
+        ])
+
         if let urlString = urlString, let url = URL(string: urlString), let postData = postData {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
@@ -54,6 +70,17 @@ class PayuWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             progressBar.progress = Float(webView.estimatedProgress)
+        }
+    }
+
+    @objc func backButtonTapped() {
+        if webView.canGoBack {
+            webView.goBack()
+        } else {
+            let alert = UIAlertController(title: "Confirm Exit", message: "Are you sure you want to exit?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Yes", style: .default) { _ in self.dismiss(animated: true) })
+            alert.addAction(UIAlertAction(title: "No", style: .cancel))
+            present(alert, animated: true)
         }
     }
 
